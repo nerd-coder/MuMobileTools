@@ -1,0 +1,60 @@
+﻿@page "/"
+@using Server.Tools
+
+<PageTitle>EncDec</PageTitle>
+
+<h1>EncDec</h1>
+
+<EditForm Model="@model" OnValidSubmit="@HandleValidSubmit" class="mb-3">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label" for="text">Input text</label>
+        <InputText class="form-control" id="text" @bind-Value="model.Text" />
+    </div>
+    <div class="mb-3 form-check">
+        <InputCheckbox class="form-check-input" id="enc" @bind-Value="model.Enc" />
+        <label class="form-check-label" for="env">Encrypt</label>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Submit</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(result))
+{
+<pre class="alert alert-success" role="alert"><code>@result</code></pre>
+}
+@if (!string.IsNullOrEmpty(error))
+{
+<pre class="alert alert-danger" role="alert"><code>@error</code></pre>
+}
+
+
+@code {
+    private EncDecModel model = new() { Text = "root", Enc = true };
+    private string result = "";
+    private string error = "";
+
+    private void HandleValidSubmit()
+    {
+        if (!string.IsNullOrEmpty(model.Text))
+        {
+            var passwd = "eabcix675u49,/";
+            var saltValue = "3&3i4x4^+-0";
+            var text = model.Text;
+            try
+            {
+                var _result = model.Enc ?
+                    StringEncrypt.Encrypt(text, passwd, saltValue) :
+                    StringEncrypt.Decrypt(text, passwd, saltValue);
+                result = _result ?? "";
+            }
+            catch (Exception e)
+            {
+                error = e.Message;
+            }
+        }
+    }
+}
+
